@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aniket Ghosh | Career Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00ff88;
+            --secondary: #00d4ff;
+            --accent: #ff00aa;
+            --purple: #a855f7;
+            --orange: #ff6b35;
+            --dark: #000000;
+            --card: #0a0a0a;
+            --card-hover: #111111;
+            --border: #1a1a1a;
+            --text: #ffffff;
+            --text-dim: #666666;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: difference;
+            transition: transform 0.15s ease, width 0.2s, height 0.2s;
+        }
+
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10001;
+            transition: transform 0.05s ease;
+        }
+
+        .cursor.hover {
+            width: 50px;
+            height: 50px;
+            border-color: var(--accent);
+            background: rgba(255, 0, 170, 0.1);
+        }
+
+        /* Interactive Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 15px 40px;
+            background: rgba(0, 0, 0, 0.95);
+            border-bottom: 1px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .content {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 40px 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+        }
+
+        .hero-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--primary);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards 0.2s;
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 10vw, 100px);
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 24px;
+            letter-spacing: -3px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards 0.4s;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 5s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards 0.6s;
+        }
+
+        .hero-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards 0.7s;
+        }
+
+        .hero-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards 0.8s;
+        }
+
+        .hero-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .hero-link:hover {
+            border-color: var(--primary);
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .hero-link.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .hero-link.primary:hover {
+            background: #00cc6a;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Styles */
+        section {
+            padding: 120px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--primary);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 700;
+            letter-spacing: -2px;
+        }
+
+        /* Experience Timeline */
+        .timeline-container {
+            position: relative;
+            padding-left: 80px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary), var(--accent), var(--purple));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 60px;
+            padding: 32px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.4s ease;
+        }
+
+        .timeline-item:hover {
+            border-color: var(--primary);
+            transform: translateX(10px);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.1);
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -62px;
+            top: 32px;
+            width: 24px;
+            height: 24px;
+            background: var(--dark);
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-marker {
+            background: var(--primary);
+            transform: scale(1.3);
+        }
+
+        .timeline-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .timeline-item h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .timeline-item h4 {
+            font-size: 16px;
+            color: var(--text-dim);
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        .timeline-item p {
+            color: var(--text-dim);
+            line-height: 1.7;
+        }
+
+        .timeline-item ul {
+            list-style: none;
+            margin-top: 12px;
+        }
+
+        .timeline-item li {
+            color: var(--text-dim);
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .timeline-item li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+
+        /* Module Cards */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .module-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .module-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .module-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .module-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--border);
+            margin-bottom: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .module-card:hover .module-number {
+            color: var(--primary);
+        }
+
+        .module-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .module-card p {
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .module-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 50px;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .module-link:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        .module-link svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* Elevator Pitch */
+        .pitch-box {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(0, 212, 255, 0.05));
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 48px;
+            position: relative;
+            margin-top: 32px;
+        }
+
+        .pitch-box::before {
+            content: '"';
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-size: 120px;
+            color: var(--primary);
+            opacity: 0.2;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+
+        .pitch-box p {
+            font-size: 20px;
+            line-height: 1.8;
+            color: var(--text);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Skills Grid */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .skill-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            padding: 8px 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-dim);
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Strategy Section */
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .strategy-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .strategy-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .strategy-card:hover {
+            border-color: var(--secondary);
+            transform: translateY(-4px);
+        }
+
+        .strategy-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .strategy-card h4 .icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .strategy-card ul {
+            list-style: none;
+        }
+
+        .strategy-card li {
+            color: var(--text-dim);
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .strategy-card li:last-child {
+            border-bottom: none;
+        }
+
+        .strategy-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .company-tag {
+            background: var(--card-hover);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .company-tag:hover {
+            border-color: var(--accent);
+        }
+
+        .company-tag h5 {
+            color: var(--primary);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .company-tag p {
+            color: var(--text-dim);
+            font-size: 12px;
+            margin: 0;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 40px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer p {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        footer .name {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            section {
+                padding: 80px 20px;
+            }
+
+            .timeline-container {
+                padding-left: 50px;
+            }
+
+            .timeline-line {
+                left: 15px;
+            }
+
+            .timeline-marker {
+                left: -47px;
+                width: 20px;
+                height: 20px;
+            }
+
+            .pitch-box {
+                padding: 32px;
+            }
+
+            .pitch-box p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
+
+    <!-- Interactive Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">AG</div>
+            <ul class="nav-links">
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#modules">Modules</a></li>
+                <li><a href="#strategy">Strategy</a></li>
+                <li><a href="resume.pdf" target="_blank">Resume</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content">
+        
+        <!-- Hero Section -->
+        <section class="hero visible">
+            <div class="hero-content">
+                <p class="hero-tag">Career Preparation e-Portfolio</p>
+                <h1><span class="gradient">Aniket Ghosh</span></h1>
+                <p class="hero-subtitle">M.S. Artificial Intelligence @ Northeastern University</p>
+                <p class="hero-date">December 4, 2025</p>
+                <div class="hero-links">
+                    <a href="resume.pdf" target="_blank" class="hero-link primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
+                        Download Resume
+                    </a>
+                    <a href="mailto:ghosh.anik@northeastern.edu" class="hero-link">📧 Email</a>
+                    <a href="https://linkedin.com/in/" target="_blank" class="hero-link">LinkedIn</a>
+                    <a href="https://github.com/" target="_blank" class="hero-link">GitHub</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Timeline -->
+        <section id="experience">
+            <div class="section-header">
+                <p class="section-tag">Professional Journey</p>
+                <h2 class="section-title">Experience Timeline</h2>
+            </div>
+
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <span class="timeline-date">Mar 2024 – May 2025</span>
+                    <h3>Researcher</h3>
+                    <h4>Jadavpur University, Kolkata, India</h4>
+                    <ul>
+                        <li>Developing cell segmentation algorithms under Dr. Kaushiki Roy and Dr. Debotosh Bhattacharjee</li>
+                        <li>Implemented custom ML algorithm outperforming state-of-the-art models including Mask R-CNN</li>
+                        <li>Paper under review at Journal of Expert Systems with Applications</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <span class="timeline-date">Feb 2023 – Jul 2023</span>
+                    <h3>Research Intern</h3>
+                    <h4>North-Eastern Hill University (NEHU) — Remote</h4>
+                    <ul>
+                        <li>Developed Indian Sign Language Recognition models under Dr. Arnab Kumar Maji</li>
+                        <li>Assembled models using Microsoft ASL, MNIST, and Static ISL datasets</li>
+                        <li>Advised on dataset quality criteria for improved model performance</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <span class="timeline-date">Dec 2022 – Jan 2023</span>
+                    <h3>Industrial Trainee</h3>
+                    <h4>Novotel Kolkata, India</h4>
+                    <ul>
+                        <li>Facilitated IT system migration from local servers to Oracle cloud infrastructure</li>
+                        <li>Resolved server issues and gained hands-on experience in cloud technologies</li>
+                        <li>Developed skills in database management and enterprise systems</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modules Section -->
+        <section id="modules">
+            <div class="section-header">
+                <p class="section-tag">Career Preparation</p>
+                <h2 class="section-title">Course Modules</h2>
+            </div>
+
+            <div class="modules-grid">
+                <!-- Module 4 -->
+                <div class="module-card">
+                    <div class="module-number">04</div>
+                    <h3>Professional Introduction</h3>
+                    <p>My elevator pitch showcasing who I am, my background in AI/ML, and what unique value I bring.</p>
+                    <a href="https://northeastern.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=da679e76-f8d9-48de-b5b1-b386003ef9d5" target="_blank" class="module-link">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        Watch Video
+                    </a>
+                </div>
+
+                <!-- Module 7 -->
+                <div class="module-card">
+                    <div class="module-number">07</div>
+                    <h3>Professional Resume</h3>
+                    <p>Comprehensive overview of education, skills, and research contributions in AI/ML.</p>
+                    <a href="resume.pdf" target="_blank" class="module-link">
+                        <svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
+                        View Resume
+                    </a>
+                </div>
+
+                <!-- Module 8 -->
+                <div class="module-card">
+                    <div class="module-number">08</div>
+                    <h3>Tell Me About Yourself</h3>
+                    <p>Structured response to the classic interview question highlighting my journey and aspirations.</p>
+                    <a href="https://northeastern.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=fc851ab4-befe-4426-81e7-b387004255e8" target="_blank" class="module-link">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        Watch Video
+                    </a>
+                </div>
+
+                <!-- Module 9 -->
+                <div class="module-card">
+                    <div class="module-number">09</div>
+                    <h3>Job Search Strategy</h3>
+                    <p>Comprehensive plan with SMART goals, target companies, and networking strategy.</p>
+                    <a href="#strategy" class="module-link">
+                        <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                        View Strategy
+                    </a>
+                </div>
+            </div>
+
+            <!-- Elevator Pitch -->
+            <div class="pitch-box">
+                <p>I'm Aniket Ghosh, a first-year MS in AI student at Northeastern's Khoury College with published research in computer vision and medical imaging. I've built ML systems that outperformed state-of-the-art models—from cell segmentation algorithms for disease diagnosis to traffic sign detection for autonomous driving. What drives me is using AI to solve real-world problems in healthcare and finance. I'm looking for a Summer 2026 internship where I can apply my deep learning skills to create meaningful impact.</p>
+            </div>
+
+            <!-- Skills -->
+            <div style="margin-top: 48px;">
+                <h3 style="font-size: 20px; margin-bottom: 16px;">Technical Skills</h3>
+                <div class="skills-container">
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">PyTorch</span>
+                    <span class="skill-tag">TensorFlow</span>
+                    <span class="skill-tag">Computer Vision</span>
+                    <span class="skill-tag">Deep Learning</span>
+                    <span class="skill-tag">NLP</span>
+                    <span class="skill-tag">YOLOv8</span>
+                    <span class="skill-tag">Mask R-CNN</span>
+                    <span class="skill-tag">AWS</span>
+                    <span class="skill-tag">Docker</span>
+                    <span class="skill-tag">LLMs & RAG</span>
+                    <span class="skill-tag">C++</span>
+                    <span class="skill-tag">SQL</span>
+                    <span class="skill-tag">Git</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strategy Section -->
+        <section id="strategy">
+            <div class="section-header">
+                <p class="section-tag">Module 9</p>
+                <h2 class="section-title">Job Search Strategy</h2>
+            </div>
+
+            <div class="strategy-grid">
+                <!-- SMART Goals -->
+                <div class="strategy-card">
+                    <h4><span class="icon">🎯</span> SMART Career Goals</h4>
+                    <ul>
+                        <li><strong>1.</strong> Secure a Summer 2026 AI/ML internship at a Boston-area company in healthcare, finance, or cybersecurity by applying to 15+ positions by February 2026</li>
+                        <li><strong>2.</strong> Submit cell segmentation research paper to Journal of Expert Systems with Applications by March 2026</li>
+                        <li><strong>3.</strong> Complete MS in AI at Northeastern with GPA of 3.8+ by May 2027</li>
+                        <li><strong>4.</strong> Build portfolio of 3 deployed ML projects on GitHub by April 2026</li>
+                    </ul>
+                </div>
+
+                <!-- Skills & Strengths -->
+                <div class="strategy-card">
+                    <h4><span class="icon">💪</span> Top Skills & Strengths</h4>
+                    <ul>
+                        <li><strong>AI/ML Foundation:</strong> 100 in Algorithms, 99 in Foundations of AI</li>
+                        <li><strong>Implementation:</strong> 4-star CodeChef (1911 rating); proficient in PyTorch & TensorFlow</li>
+                        <li><strong>Problem-Solving:</strong> Applied ML across healthcare, transportation, and cybersecurity</li>
+                        <li><strong>Quick Learner:</strong> Picked up cloud tech during Novotel training</li>
+                        <li><strong>Initiative:</strong> Organized COVID-19 relief efforts</li>
+                    </ul>
+                </div>
+
+                <!-- Target Companies -->
+                <div class="strategy-card full-width">
+                    <h4><span class="icon">🏢</span> Target Companies</h4>
+                    <div class="company-grid">
+                        <div class="company-tag">
+                            <h5>Tempus</h5>
+                            <p>Healthcare AI, precision medicine</p>
+                        </div>
+                        <div class="company-tag">
+                            <h5>Kensho (S&P Global)</h5>
+                            <p>Boston fintech, NLP for finance</p>
+                        </div>
+                        <div class="company-tag">
+                            <h5>Schrödinger</h5>
+                            <p>ML for drug discovery</p>
+                        </div>
+                        <div class="company-tag">
+                            <h5>SOPHiA GENETICS</h5>
+                            <p>Genomic data analysis</p>
+                        </div>
+                        <div class="company-tag">
+                            <h5>IQVIA</h5>
+                            <p>Healthcare AI, life sciences</p>
+                        </div>
+                        <div class="company-tag">
+                            <h5>Liberty Mutual</h5>
+                            <p>AI risk modeling, Boston HQ</p>
+                        </div>
+                        <div class="company-tag">
+                            <h5>Coinbase</h5>
+                            <p>ML fraud detection, crypto</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Items -->
+                <div class="strategy-card">
+                    <h4><span class="icon">✅</span> Action Items</h4>
+                    <ul>
+                        <li>Identify skill gaps from job descriptions — <strong style="color: var(--accent);">Dec 2025</strong></li>
+                        <li>Create 3 tailored resumes (Healthcare, Fintech, Cybersecurity) — <strong style="color: var(--accent);">Jan 2026</strong></li>
+                        <li>Network with alumni at target companies — <strong style="color: var(--accent);">Jan 2026</strong></li>
+                        <li>Submit first batch of 5+ applications — <strong style="color: var(--accent);">Jan 25, 2026</strong></li>
+                    </ul>
+                </div>
+
+                <!-- Networking -->
+                <div class="strategy-card">
+                    <h4><span class="icon">🤝</span> Networking Events</h4>
+                    <ul>
+                        <li><strong>Boston Generative AI Meetup</strong> — Monthly at Microsoft NERD Center</li>
+                        <li><strong>AI Tinkerers Boston</strong> — Monthly hands-on AI meetup</li>
+                        <li><strong>ODSC East</strong> — April 2026 in Boston</li>
+                        <li><strong>Khoury Career Fair</strong> — Spring 2026</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2025 <span class="name">Aniket Ghosh</span> • Career Preparation Portfolio • Northeastern University</p>
+        </footer>
+    </div>
+
+    <script>
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorDot = document.querySelector('.cursor-dot');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorDot.style.left = mouseX + 'px';
+            cursorDot.style.top = mouseY + 'px';
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Cursor hover effects
+        const hoverElements = document.querySelectorAll('a, button, .module-card, .timeline-item, .skill-tag, .company-tag');
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        // Interactive Background Canvas
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // Particle System
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+                this.opacity = Math.random() * 0.5 + 0.2;
+                this.color = Math.random() > 0.5 ? '#00ff88' : '#00d4ff';
+            }
+
+            update() {
+                // Mouse attraction
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 200) {
+                    const force = (200 - dist) / 200;
+                    this.vx += (dx / dist) * force * 0.02;
+                    this.vy += (dy / dist) * force * 0.02;
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Damping
+                this.vx *= 0.99;
+                this.vy *= 0.99;
+
+                // Bounds
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        const particles = [];
+        for (let i = 0; i < 100; i++) {
+            particles.push(new Particle());
+        }
+
+        // Connection lines
+        function drawConnections() {
+            particles.forEach((p1, i) => {
+                particles.slice(i + 1).forEach(p2 => {
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(0, 255, 136, ${0.15 * (1 - dist / 120)})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                });
+            });
+        }
+
+        // Mouse trail
+        const trail = [];
+        const maxTrail = 20;
+
+        document.addEventListener('mousemove', (e) => {
+            trail.push({ x: e.clientX, y: e.clientY, age: 0 });
+            if (trail.length > maxTrail) trail.shift();
+        });
+
+        function drawTrail() {
+            trail.forEach((point, i) => {
+                const opacity = (1 - point.age / 30) * 0.3;
+                const radius = (1 - point.age / 30) * 15;
+                
+                if (opacity > 0 && radius > 0) {
+                    const gradient = ctx.createRadialGradient(
+                        point.x, point.y, 0,
+                        point.x, point.y, radius
+                    );
+                    gradient.addColorStop(0, `rgba(0, 255, 136, ${opacity})`);
+                    gradient.addColorStop(1, 'rgba(0, 255, 136, 0)');
+                    
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                }
+                
+                point.age++;
+            });
+
+            // Remove old trail points
+            while (trail.length > 0 && trail[0].age > 30) {
+                trail.shift();
+            }
+        }
+
+        // Click ripple effect
+        const ripples = [];
+
+        document.addEventListener('click', (e) => {
+            ripples.push({
+                x: e.clientX,
+                y: e.clientY,
+                radius: 0,
+                maxRadius: 150,
+                opacity: 1
+            });
+        });
+
+        function drawRipples() {
+            ripples.forEach((ripple, index) => {
+                ripple.radius += 3;
+                ripple.opacity = 1 - (ripple.radius / ripple.maxRadius);
+
+                if (ripple.opacity > 0) {
+                    ctx.beginPath();
+                    ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(0, 255, 136, ${ripple.opacity * 0.5})`;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(ripple.x, ripple.y, ripple.radius * 0.6, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(0, 212, 255, ${ripple.opacity * 0.3})`;
+                    ctx.stroke();
+                } else {
+                    ripples.splice(index, 1);
+                }
+            });
+        }
+
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw connections
+            drawConnections();
+
+            // Update and draw particles
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            // Draw trail
+            drawTrail();
+
+            // Draw ripples
+            drawRipples();
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
